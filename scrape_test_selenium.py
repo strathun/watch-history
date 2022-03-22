@@ -18,7 +18,7 @@ page_to_scrape.get("http://quotes.toscrape.com")
 
 page_to_scrape.find_element(By.LINK_TEXT, "Login").click()
 
-
+# test
 time.sleep(3) # wait 3 seconds for login to load
 username = page_to_scrape.find_element(By.ID, "username")
 password = page_to_scrape.find_element(By.ID, "password")
