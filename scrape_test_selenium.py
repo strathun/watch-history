@@ -1,7 +1,5 @@
-# Copied from Tinkernut's video:
+# Adapted from Tinkernut's video:
 # https://www.youtube.com/watch?v=tRNwTXeJ75U&t=18s
-#from bs4 import BeautifulSoup
-#import requests
 import csv
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
