@@ -21,15 +21,16 @@ time.sleep(3) # wait 3 seconds for login to load
 username = page_to_scrape.find_element(By.ID, "id_userLoginId")
 password = page_to_scrape.find_element(By.ID, "id_password")
 
-login_data = np.genfromtxt('login_info.csv', dtype=None, encoding=None, skip_header=1, names=("Service, Username, Password"))
+login_data = np.genfromtxt('login_info.csv', dtype=None, encoding=None, skip_header=1, names=("Service, Username, Password, Account"))
 User = login_data[login_data['Service']=='Netflix']['Username']
 Pass = login_data[login_data['Service']=='Netflix']['Password']
+Account = login_data[login_data['Service']=='Netflix']['Account']
 username.send_keys(User)
 password.send_keys(Pass)
 
 page_to_scrape.find_element(By.CSS_SELECTOR, "button.login-button").click()
 time.sleep(3) # wait 3 seconds for login to load
-page_to_scrape.find_element(By.LINK_TEXT, "Hunny").click()
+page_to_scrape.find_element(By.LINK_TEXT, *Account).click()
 # file = open("scraped_quotes.csv", "w")
 # writer = csv.writer(file)
 # 
