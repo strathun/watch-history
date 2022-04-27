@@ -29,6 +29,7 @@ password.send_keys(Pass)
 page_to_scrape.find_element(By.CSS_SELECTOR, "button.login-button").click()
 time.sleep(3) # wait 3 seconds for login to load
 page_to_scrape.find_element(By.LINK_TEXT, *Account).click()
+time.sleep(3)
 
 # Go into account menu
 page_to_scrape.find_element(By.CSS_SELECTOR, "div.account-menu-item").click()
@@ -37,12 +38,18 @@ page_to_scrape.find_element(By.LINK_TEXT, "Account").click()
 page_to_scrape.find_element(By.ID, "profile_3").click()
 page_to_scrape.find_element(By.XPATH, '//*[@id="profile_3"]/ul/li[5]/a/div[1]').click()
 
-#page_to_scrape.find_element(By.LINK_TEXT, 'Viewing activity').click()
-# file = open("scraped_quotes.csv", "w")
-# writer = csv.writer(file)
-# 
-# writer.writerow(["QUOTES", "AUTHORS"])
-# 
+file = open("scraped_activity.csv", "w")
+writer = csv.writer(file)
+
+writer.writerow(["DATE", "TITLE"])
+
+date = page_to_scrape.find_elements(By.CLASS_NAME, "date")
+title = page_to_scrape.find_elements(By.CLASS_NAME, "title")
+for date, title in zip(date, title):
+    print(date.text + title.text)
+    writer.writerow([date.text, title.text])
+file.close()
+
 # while True:
 #     quotes = page_to_scrape.find_elements(By.CLASS_NAME, "text")
 #     authors = page_to_scrape.find_elements(By.CLASS_NAME, "author")
