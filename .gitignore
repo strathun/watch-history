@@ -1,4 +1,5 @@
 login_info.csv
 scraped_quotes.csv
 scraped_activity.csv
+scraped_activity_netflix.csv
 test.py
