@@ -47,7 +47,6 @@ titles = []
 if exists("scraped_activity_netlix.csv"):
     print('Not first run')
     # working with dataframes now. Next steps:
-    # figure out why not everything on the loaded page is being scraped
     # get this if statement going:
         # copy mostly everything from below, but have it first load the last
         # entry in the csv file and press the button until this shows up on screen
@@ -71,15 +70,16 @@ else:
             page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").click()
         except NoSuchElementException:
             break
-        if test_counter > 2:
+        if test_counter > 3:
             break
+    time.sleep(3)
     date = page_to_scrape.find_elements(By.CLASS_NAME, "date")
     title = page_to_scrape.find_elements(By.CLASS_NAME, "title")
     #new method
-    time.sleep(3)
     for date, title in zip(date, title):
         dates.append(date.text)
         titles.append(title.text)
+        print(title.text)
     dates.reverse()
     titles.reverse()
     new_data = pd.DataFrame({'DATE': dates, 'TITLE': titles})
