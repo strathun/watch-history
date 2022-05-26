@@ -44,11 +44,11 @@ page_to_scrape.find_element(By.XPATH, '//*[@id="profile_3"]/ul/li[5]/a/div[1]').
 dates = []
 titles = []
 
-if exists("scraped_activity_netlix.csv"):
+if exists("scraped_activity_netflix.csv"):
     print('Not first run')
     # Get last entry to see how many button presses are needed
-    count=len(open("scraped_activity_netlix.csv").readlines()) 
-    last_entry=pd.read_csv("scraped_activity_netlix.csv", skiprows=range(1,count-1), header=0)
+    count=len(open("scraped_activity_netflix.csv").readlines()) 
+    last_entry=pd.read_csv("scraped_activity_netflix.csv", skiprows=range(1,count-1), header=0)
     while True:
         dates = []
         titles = []
@@ -62,57 +62,32 @@ if exists("scraped_activity_netlix.csv"):
         df = temp_data.merge(last_entry, how='left', indicator=True, left_on=['DATE','TITLE'], right_on=['DATE','TITLE'])
         mask = df['_merge']=='both'
         selected_rows  = list(temp_data[mask].index)
-        #mask = (last_entry[['DATE','TITLE']].isin(temp_data[['DATE','TITLE']])).all(axis=1)
-        #selected_rows  = list(temp_data[mask].index)
         if len(selected_rows) >0:
             # cut out data we've already saved and invert the df to be saved
             temp_data = temp_data[:selected_rows[0]]
             temp_data = temp_data.iloc[::-1]
             #append the data to the CSV
-            temp_data.to_csv('scraped_activity_netlix.csv', mode='a', index=False, header=False)
+            temp_data.to_csv('scraped_activity_netflix.csv', mode='a', index=False, header=False)
             break
         else:
             try:
                 page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").click()
             except NoSuchElementException:
                 break
-    # working with dataframes now. Next steps:
-    # get this if statement going:
-        # copy mostly everything from below, but have it first load the last
-        # entry in the csv file and press the button until this shows up on screen
-        # THEN! after this matches, grab all the data on screen, convert it to the dataframe
-        # delete the matched entry and everything after it. Invert it, and then
-        # append it to the previously created csv (need to look up how to do this).
 else:
     print('First data grab. Could take a while')
-    # Grab ALL the data if it's the first run. Test tomorrow by removing counters
-    ## file = open("scraped_activity_netlix.csv", "w")
-    #writer = csv.writer(file)
-    #writer.writerow(["DATE", "TITLE"])
-    test_counter = 0 # temporary counter to keep it from loading all previous data
     while True:
-        test_counter = test_counter + 1
-        ## Previous method that works. 
-        #for date, title in zip(date, title):
-            #print(date.text + title.text)
-            #writer.writerow([date.text, title.text])
-        try:
+        if page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").is_enabled():
             page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").click()
-        except NoSuchElementException:
-            break
-        if test_counter > 3:
+        else:
             break
     time.sleep(3)
     date = page_to_scrape.find_elements(By.CLASS_NAME, "date")
     title = page_to_scrape.find_elements(By.CLASS_NAME, "title")
-    #new method
     for date, title in zip(date, title):
         dates.append(date.text)
         titles.append(title.text)
-        print(title.text)
     dates.reverse()
     titles.reverse()
     new_data = pd.DataFrame({'DATE': dates, 'TITLE': titles})
-    new_data.to_csv('scraped_activity_netlix.csv', index=False, encoding='utf-8')
-    print(new_data)
-    #file.close()
+    new_data.to_csv('scraped_activity_netflix.csv', index=False, encoding='utf-8')
