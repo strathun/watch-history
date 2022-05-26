@@ -46,6 +46,36 @@ titles = []
 
 if exists("scraped_activity_netlix.csv"):
     print('Not first run')
+    # Get last entry to see how many button presses are needed
+    count=len(open("scraped_activity_netlix.csv").readlines()) 
+    last_entry=pd.read_csv("scraped_activity_netlix.csv", skiprows=range(1,count-1), header=0)
+    while True:
+        dates = []
+        titles = []
+        date = page_to_scrape.find_elements(By.CLASS_NAME, "date")
+        title = page_to_scrape.find_elements(By.CLASS_NAME, "title")
+        for date, title in zip(date, title):
+            dates.append(date.text)
+            titles.append(title.text)
+        temp_data = pd.DataFrame({'DATE': dates, 'TITLE': titles})
+        # Check to see if any matches in temp_data to the last val in CSV
+        df = temp_data.merge(last_entry, how='left', indicator=True, left_on=['DATE','TITLE'], right_on=['DATE','TITLE'])
+        mask = df['_merge']=='both'
+        selected_rows  = list(temp_data[mask].index)
+        #mask = (last_entry[['DATE','TITLE']].isin(temp_data[['DATE','TITLE']])).all(axis=1)
+        #selected_rows  = list(temp_data[mask].index)
+        if len(selected_rows) >0:
+            # cut out data we've already saved and invert the df to be saved
+            temp_data = temp_data[:selected_rows[0]]
+            temp_data = temp_data.iloc[::-1]
+            #append the data to the CSV
+            temp_data.to_csv('scraped_activity_netlix.csv', mode='a', index=False, header=False)
+            break
+        else:
+            try:
+                page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").click()
+            except NoSuchElementException:
+                break
     # working with dataframes now. Next steps:
     # get this if statement going:
         # copy mostly everything from below, but have it first load the last
@@ -56,7 +86,7 @@ if exists("scraped_activity_netlix.csv"):
 else:
     print('First data grab. Could take a while')
     # Grab ALL the data if it's the first run. Test tomorrow by removing counters
-    file = open("scraped_activity_netlix.csv", "w")
+    ## file = open("scraped_activity_netlix.csv", "w")
     #writer = csv.writer(file)
     #writer.writerow(["DATE", "TITLE"])
     test_counter = 0 # temporary counter to keep it from loading all previous data
@@ -85,4 +115,4 @@ else:
     new_data = pd.DataFrame({'DATE': dates, 'TITLE': titles})
     new_data.to_csv('scraped_activity_netlix.csv', index=False, encoding='utf-8')
     print(new_data)
-    file.close()
+    #file.close()
