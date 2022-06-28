@@ -7,6 +7,7 @@ from selenium.common.exceptions import NoSuchElementException
 import numpy as np
 import pandas as pd
 from os.path import exists
+from datetime import datetime as dt
 #Eventually go "headless" when don't need to watch everything happen anymore.
 # This will reduce load times.
 #IF USING A RASPBERRY PI, FIRST INSTALL THIS OPTIMIZED CHROME DRIVER
@@ -70,6 +71,11 @@ if exists("scraped_activity_netflix.csv"):
             temp_data.to_csv('scraped_activity_netflix.csv', mode='a', index=False, header=False)
             break
         else:
+            # verify haven't gone past date of previous saved entry. If so, print notice.
+            current_date = dt.strptime(temp_data.iloc[-1].DATE, "%m/%d/%y")
+            previous_date = dt.strptime(last_entry.iloc[-1].DATE, "%m/%d/%y")
+            if current_date < previous_date:
+                print("Looks like you've gone past the last saved entry. There might be a change to Netflix's naming convention.")
             try:
                 page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").click()
             except NoSuchElementException:
