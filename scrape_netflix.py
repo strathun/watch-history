@@ -46,7 +46,7 @@ dates = []
 titles = []
 
 if exists("scraped_activity_netflix.csv"):
-    print('Not first run')
+    print('Updating list...')
     # Get last entry to see how many button presses are needed
     count=len(open("scraped_activity_netflix.csv").readlines()) 
     last_entry=pd.read_csv("scraped_activity_netflix.csv", skiprows=range(1,count-1), header=0)
@@ -76,6 +76,19 @@ if exists("scraped_activity_netflix.csv"):
             previous_date = dt.strptime(last_entry.iloc[-1].DATE, "%m/%d/%y")
             if current_date < previous_date:
                 print("Looks like you've gone past the last saved entry. There might be a change to Netflix's naming convention.")
+                # Loading in saved data and looking for the first match, then saving overwriting anything after and adding new data
+                saved_data = pd.read_csv("scraped_activity_netflix.csv", header=0)
+                df = temp_data.merge(saved_data, how='left', indicator=True, left_on=['DATE','TITLE'], right_on=['DATE','TITLE'])
+                mask = df['_merge']=='both'
+                selected_rows  = list(temp_data[mask].index)
+                temp_data = temp_data[:selected_rows[0]+1]
+                temp_data = temp_data.iloc[::-1]
+                temp_data = temp_data.reset_index(drop=True)
+                temp_df = saved_data.loc[saved_data['TITLE']==temp_data['TITLE'][0]]
+                end_index = temp_df.index.tolist()
+                saved_data = saved_data[:end_index[0]].append(temp_data)
+                saved_data.to_csv('scraped_activity_netflix.csv', index=False, encoding='utf-8')
+                break
             try:
                 page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").click()
             except NoSuchElementException:
