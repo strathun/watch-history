@@ -39,9 +39,6 @@ time.sleep(3)
 page_to_scrape.find_element(By.CSS_SELECTOR, "div.account-menu-item").click()
 page_to_scrape.find_element(By.LINK_TEXT, "Account").click()
 
-# got the first profile 3 replaced, just need to work on the second one now.
-    # Start poking around here: https://stackoverflow.com/questions/16016521/how-do-i-select-child-elements-of-any-depth-using-xpath
-# page_to_scrape.find_element(By.ID, "profile_3").click()
 profile_path_string = '//div[@class="profile-summary"]/h3[text()="' + Account[0] +'"]'
 page_to_scrape.find_element(By.XPATH, profile_path_string).click()
 page_to_scrape.find_element(By.XPATH, '//li[@class="single-profile expanded"]//h4[text()="Viewing activity"]').click()
