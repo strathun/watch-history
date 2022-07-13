@@ -39,8 +39,12 @@ time.sleep(3)
 page_to_scrape.find_element(By.CSS_SELECTOR, "div.account-menu-item").click()
 page_to_scrape.find_element(By.LINK_TEXT, "Account").click()
 
-page_to_scrape.find_element(By.ID, "profile_3").click()
-page_to_scrape.find_element(By.XPATH, '//*[@id="profile_3"]/ul/li[5]/a/div[1]').click()
+# got the first profile 3 replaced, just need to work on the second one now.
+    # Start poking around here: https://stackoverflow.com/questions/16016521/how-do-i-select-child-elements-of-any-depth-using-xpath
+# page_to_scrape.find_element(By.ID, "profile_3").click()
+profile_path_string = '//div[@class="profile-summary"]/h3[text()="' + Account[0] +'"]'
+page_to_scrape.find_element(By.XPATH, profile_path_string).click()
+page_to_scrape.find_element(By.XPATH, '//li[@class="single-profile expanded"]//h4[text()="Viewing activity"]').click()
 
 dates = []
 titles = []
@@ -69,6 +73,7 @@ if exists("scraped_activity_netflix.csv"):
             temp_data = temp_data.iloc[::-1]
             #append the data to the CSV
             temp_data.to_csv('scraped_activity_netflix.csv', mode='a', index=False, header=False)
+            print("All up to date!")
             break
         else:
             # verify haven't gone past date of previous saved entry. If so, print notice.
@@ -88,6 +93,7 @@ if exists("scraped_activity_netflix.csv"):
                 end_index = temp_df.index.tolist()
                 saved_data = saved_data[:end_index[0]].append(temp_data)
                 saved_data.to_csv('scraped_activity_netflix.csv', index=False, encoding='utf-8')
+                print("All up to date!")
                 break
             try:
                 page_to_scrape.find_element(By.CLASS_NAME, "btn-blue").click()
